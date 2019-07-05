@@ -1,5 +1,5 @@
-#CURRENT                                                                                                                 
-Started work on the file                                         
+# CURRENT                                                                                                                 
+- Started work on the file                                         
 - got a basic understanding of pulling the links down and a basic use of Bs4 to get the links                                                                                   
 
 # TODO:                                                                                                                   
