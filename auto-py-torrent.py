@@ -24,6 +24,7 @@ import re
 import textwrap
 import coloredlogs
 import requests
+import time
 
 from bs4 import BeautifulSoup
 from bs4 import UnicodeDammit
@@ -133,6 +134,8 @@ class AutoPy:
         self.torrent = ""
         self.torrent_page = torrent_page
         self.url = ""
+        self.movieName = ""
+        self.retries = 0
 
     
     def get_magnet(self, url):
@@ -144,9 +147,8 @@ class AutoPy:
         if not os.path.isfile('movieMagnets.txt'):
             with open('movieMagnets.txt', 'w') as file:
                 file.close()
-        with open('movieMagnets.txt', 'w') as linkFile:
+        with open('movieMagnets.txt', 'a') as linkFile:
             linkFile.write(url+'\n')
-            linkFile.close()
         
 
     def download_torrent(self):
@@ -170,7 +172,7 @@ class AutoPy:
                                        'isohunt']:
                         url = self.hrefs[int(self.selected)]
                         self.get_magnet(url)
-                        print('Downloading..')
+                        print('Downloading movie: '+self.movieName+' from url: '+url)
                     else:
                         print('Bad selected page.')
                 else:
@@ -232,7 +234,6 @@ class AutoPy:
                        else Colors.PURPLE + sizes[i].strip() + Colors.ENDC]
                       for i in range(len(self.hrefs))]
 
-
     def soupify(self):
         """Get proper torrent/magnet information.
 
@@ -248,10 +249,19 @@ class AutoPy:
                     main.find('a', href=re.compile('torrent'))['href']
                 self.get_magnet(rated_url)
             else:
-                trs = main.find_all('tr', limit=30)[1:]
-                self.elements = list(
-                    zip(*[tr.find_all('td', recursive=False)[1:]
-                          for tr in trs]))  # Magnets        
+                try:                
+                    trs = main.find_all('tr', limit=30)[1:]
+                    self.elements = list(
+                        zip(*[tr.find_all('td', recursive=False)[1:]
+                            for tr in trs]))  # Magnets   
+                except:
+                    if main is None:
+                        print('Failed to get data for movie: '+self.movieName+' retrying attempt '+str(self.retries+1)+' out of 5')
+                        self.retries += 1
+                        time.sleep(5)
+                        if self.retries < 5:
+                            self.soupify()
+
         else:
             print('Cannot soupify current page. Try again.')
 
@@ -298,23 +308,12 @@ class AutoPy:
             self.soupify()
             if self.mode_search == 'list':
                 self.build_table()
-                if len(self.hrefs) == 1:
-                    print('Press "0" to download it.')
-                elif len(self.hrefs) >= 2:
-                    print('\nSelect one of the following torrents. ' +
-                          'Enter a number between: 0 and ' +
-                          str(len(self.hrefs) - 1))
-
-                print('If you want to exit write "' +
-                      Colors.LRED + 'Q' + Colors.ENDC + '" or "' +
-                      Colors.LRED + 'q' + Colors.ENDC + '".')
-                print('If you want to go back to menu and search again write "' +
-                      Colors.LGREEN + 'B' + Colors.ENDC + '" or "' +
-                      Colors.LGREEN + 'b' + Colors.ENDC + '".')
+                
                 while not(self.picked_choice):
                     self.picked_choice = self.handle_select()
         except Exception:
             print('ERROR select_torrent: ')
+            print('Could not download movie: '+self.movieName)
             logging.error(traceback.format_exc())
             sys.exit(0)
 
@@ -401,8 +400,11 @@ def run_it():
             print('Please insert an appropiate non-empty string.')
         else:
             args.str_search = args.str_search.replace('_',' ').replace("'",'')
+
+            movieName = args.str_search
             #print(args.str_search)
             auto = AutoPy(*insert(args))
+            auto.movieName = movieName
             auto.get_content()
             auto.select_torrent()
             auto.download_torrent()

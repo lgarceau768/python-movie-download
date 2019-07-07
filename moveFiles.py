@@ -1,4 +1,4 @@
-import os, sys
+import os, sys, configparser
 from pathlib import Path
 
 # function to get movie extensions from file
@@ -27,7 +27,10 @@ def getDirNames(pathList, extensions):
     return dirNames
 
 # get subdirs
-paths = os.listdir('D:\Movies\\')
+config = configparser.ConfigParser()
+config.read('config.ini')
+outputDir = config.get('Output', 'output location')
+paths = os.listdir(outputDir)
 movieFileExtensions = getMovieExtensions()
 dirNames = getDirNames(paths, movieFileExtensions)
 newList = []
@@ -39,17 +42,27 @@ for dirName in dirNames:
 dirNames = newList
 
 for dirName in dirNames:
-    for file in os.listdir('D:\Movies\\'+dirName+'\\'):
+    for file in os.listdir(outputDir+dirName+'\\'):
         for extension in movieFileExtensions:
             if file.endswith(extension):
-                path = os.path.join('D:\Movies\\'+dirName+'\\', file)
+                path = os.path.join(outputDir+dirName+'\\', file)
                 if os.path.getsize(path) >= 1000000000: # only move files over 1gb                    
                     #print(path)
                     try:
-                        os.system('move '+path+' D:\Movies\\')
-                        os.system('rmdir /Q /S D:\Movies\\'+dirName)
+                        if not os.path.isfile('listOfMovies.txt'):
+                            with open('listOfMovies.txt', 'w') as file:
+                                file.close()
+                        with open('listOfMovies.txt', 'a') as movieList:
+                            movieList.write(path)
+                        try:
+                            os.system('move '+path+' D:\Movies\\')
+                        except Exception as e:
+                            print('Error moving path: '+str(path)+' must manually move')
+                        try:
+                            os.system('rmdir /Q /S D:\Movies\\'+dirName)
+                        except Exception as e:
+                            print('Error removing dir: '+dirName+ ' must manually remove')
                     except Exception as e:
-                        print('Error moving path: '+str(path)+' must manually move')
-                
-                
+                        print('Error file operations path: '+str(path)+' must manually move')
+                   
     

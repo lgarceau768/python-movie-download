@@ -37,7 +37,30 @@ def readFile(file):
                         if len(movieName) > 1:
                             fileList.append(movieName)
     return fileList
-            
+
+# function to return already downloaded movies
+def getMovies():
+    movieList = []
+    if not os.path.isfile('listOfMovies.txt'):
+        return None
+    else:
+        movieList = readFile('listOfMovies.txt')
+        newList = []
+        for movie in movieList:
+            newList.append(movie.replace('.',' '))
+    movieList = newList
+    return movieList   
+
+# check to see if the movie is already downloaded
+def checkDownloaded(movie, downloadedList):
+    if downloadedList is not None:
+        for dlMovie in downloadedList:
+            if dlMovie is not None:
+                dlMovie = dlMovie.strip()
+                movie = movie.strip()
+                if movie in dlMovie:
+                    return True
+    return False
 
 ####  main script
 # find the total time execution of the program
@@ -64,14 +87,25 @@ movieList = []
 
 if operation == 'single':
     # run the auto-py-torrent script options 0 1 moviename
-    print(movieName)
-    os.system("python auto-py-torrent.py 1 1 '"+movieName.replace(' ','_')+"'")
+    #print(movieName)
+    downloadedMovies = getMovies()
+    if not checkDownloaded(movieName, downloadedMovies):
+        os.system("python auto-py-torrent.py 1 1 '"+movieName.replace(' ','_')+"'")
+    else:
+        print('Movie already downloaded')
 if operation == 'bulk':
     movies = readFile(fileName)
-    print(movies)
+    downloadedMovies = getMovies()
+    #@print(movies)
+    with open('movieMagnets.txt', 'w') as file:
+        file.close()
     for movie in movies:
+        
+        if not checkDownloaded(movie, downloadedMovies):
         #print('movie')
-        os.system('python .\\auto-py-torrent.py 1 1 '+movie.replace(' ','_'))
+            os.system('python .\\auto-py-torrent.py 1 1 '+movie.replace(' ','_'))
+        else:
+            print('Movie already downloaded')
 
 # now output the movies to a text file
 
