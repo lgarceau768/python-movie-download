@@ -32,12 +32,6 @@ from tabulate import tabulate
 
 MODES = 'best_rated list'.split()
 
-# {'torrentz2':
-#  {'page': 'https://torrentz2.eu/search?f=',
-#   'key_search': 'did not match'}},
-# {'rarbg':
-#  {'page': 'https://rarbg.to/torrents.php?search=',
-#   'key_search': '<div id="pager_links"></div>'}},
 
 TORRENTS = ({'torrent_project':
              {'page': 'https://torrentproject.se/?t=',
@@ -46,23 +40,7 @@ TORRENTS = ({'torrent_project':
             {'the_pirate_bay':
              {'page': 'https://openpirate.org/search.php?q=',
               'key_search': 'No hits',
-              'domain': 'https://openpirate.org'}},
-            {'1337x':
-             {'page': 'https://1337x.to/search/',
-              'key_search': 'No results were returned',
-              'domain': 'https://1337x.to'}},
-            {'eztv':
-             {'page': 'https://eztv.ag/search/',
-              'key_search': 'It does not have any.',
-              'domain': 'https://eztv.ag'}},
-            {'limetorrents':
-             {'page': 'https://www.limetorrents.cc/search/all/',
-              'key_search': 'No results found',
-              'domain': 'https://www.limetorrents.cc'}},
-            {'isohunt':
-             {'page': 'https://isohunt.to/torrents/?ihq=',
-              'key_search': 'No results found',
-              'domain': 'https://isohunt.to'}})
+              'domain': 'https://openpirate.org'}})
 logging.basicConfig(level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 coloredlogs.install()
@@ -100,63 +78,10 @@ def get_parser():
 
     It parses argv/input into args variable.
     """
-    desc = Colors.LIGHTBLUE + textwrap.dedent(
-        '''\
-        Welcome to
-                      _                           _                            _
-           __ _ _   _| |_ ___      _ __  _   _   | |_ ___  _ __ _ __ ___ _ __ | |_
-          / _` | | | | __/ _ \    | '_ \| | | |  | __/ _ \| '__| '__/ _ \ '_ \| __|
-         | (_| | |_| | || (_) |   | |_) | |_| |  | || (_) | |  | | |  __/ | | | |_
-          \__,_|\__,_|\__\___/____| .__/ \__, |___\__\___/|_|  |_|  \___|_| |_|\__|
-                            |_____|_|    |___/_____|
-
-        ------------------------------------
-          auto_py_torrent is an automated tool for download files by obtaining
-        torrents or magnets that are in different provided pages that the
-        user can choose.
-
-          Its goal is to make it easier for users to find the files they want
-        and download them instantly.
-
-          An auto_py_torrent command is provided in which the user can
-        currently choose between two modes, best_rated and list mode, then it
-        selects one of the torrent tracking pages for multimedia content and
-        finally enter the text of what you want to download.
-        ------------------------------------
-        ''') + Colors.ENDC
-    usage_info = Colors.LGREEN + textwrap.dedent(
-        '''\
-
-        Use "%(prog)s --help" for more information.
-        Examples:
-            use "%(prog)s MODE SELECTED_PAGE STRING_TO_SEARCH # generic.
-            use "%(prog)s 0 0 "The simpsons" # best rated.
-            use "%(prog)s 1 0 "The simpsons" # list rated.
-
-        Mode options:
-            0: best_rated. # Download the most rated file.
-            1: list. # Get a list, and select one of them.
-
-        Page list options:
-            0: torrent project.
-            1: the pirate bay.
-            2: 1337x.
-            3: eztv.
-            4: limetorrents.
-            5: isohunt.
-        ''') + Colors.ENDC
-    epi = Colors.LIGHTPURPLE + textwrap.dedent(
-        '''\
-        -> Thanks for using auto_py_torrent!
-        ''') + Colors.ENDC
-
-    # Parent and only parser.
+        # Parent and only parser.
     parser = argparse.ArgumentParser(
         add_help=True,
-        formatter_class=argparse.RawTextHelpFormatter,
-        usage=usage_info,
-        description=desc,
-        epilog=epi)
+        formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('mode', action='store',
                         choices=range(len(MODES)),
                         type=int,
@@ -209,27 +134,7 @@ class AutoPy:
         self.torrent_page = torrent_page
         self.url = ""
 
-    def open_magnet(self):
-        """Open magnet according to os."""
-        if sys.platform.startswith('linux'):
-            subprocess.Popen(['xdg-open', self.url],
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        elif sys.platform.startswith('win32'):
-            #os.startfile(self.magnet)
-            # will run aria2c.exe from cmd
-            print("aria2c.exe --seed-time=0 \'"+self.url+"")
-            #os.system('cd D:\\Movies\\')
-            #os.system("aria2c.exe --seed-time=0 '"+self.url+"'")
-
-        elif sys.platform.startswith('cygwin'):
-            os.startfile(self.magnet)
-        elif sys.platform.startswith('darwin'):
-            subprocess.Popen(['open', self.magnet],
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        else:
-            subprocess.Popen(['xdg-open', self.magnet],
-                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
+    
     def get_magnet(self, url):
         """Get magnet from torrent page. Url already got domain."""
         #print(url+ '\ndomain:  '+self.domain)
@@ -239,32 +144,10 @@ class AutoPy:
         if not os.path.isfile('movieMagnets.txt'):
             with open('movieMagnets.txt', 'w') as file:
                 file.close()
-        with open('movieMagnets.txt', 'a') as linkFile:
+        with open('movieMagnets.txt', 'w') as linkFile:
             linkFile.write(url+'\n')
             linkFile.close()
-        # content_most_rated = requests.get(url)
-        # rated_soup = BeautifulSoup(content_most_rated.content, 'lxml')
-
-        # if self.page == 'torrent_project':
-        #     self.magnet = rated_soup.find(
-        #         'a', href=True, text=re.compile('Download'))['href']
-
-        # elif self.page == 'the_pirate_bay':
-        #     self.magnet = rated_soup.find(
-        #         'a', href=True, text=re.compile('Get this torrent'))['href']
-
-        # elif self.page == '1337x':
-        #     div1337 = rated_soup.find(
-        #         'div', {'class': 'torrent-category-detail'})
-        #     self.magnet = div1337.find('a', href=re.compile('magnet'))['href']
-
-        # elif self.page == 'isohunt':
-        #     self.magnet = rated_soup.find(
-        #         'a', href=re.compile('magnet'))['href']
-
-        # else:
-        #     print('Wrong page to get magnet!')
-        #     sys.exit(1)
+        
 
     def download_torrent(self):
         """Download torrent.
@@ -278,24 +161,16 @@ class AutoPy:
             if self.found_torrents is False:
                 print('Nothing found.')
                 return
-            if self.mode_search == 'best_rated':
-                print('Downloading..')
-                self.open_magnet()
             elif self.mode_search == 'list':
                 if self.selected is not None:
                     # t_p, pirate and 1337x got magnet inside, else direct.
-                    if self.page in ['eztv', 'limetorrents']:
-                        self.magnet = self.hrefs[int(self.selected)]
-                        print('Downloading..1')
-                        self.open_magnet()
-                    elif self.page in ['the_pirate_bay',
+                    if self.page in ['the_pirate_bay',
                                        'torrent_project',
                                        '1337x',
                                        'isohunt']:
                         url = self.hrefs[int(self.selected)]
                         self.get_magnet(url)
-                        print('Downloading..2')
-                        self.open_magnet()
+                        print('Downloading..')
                     else:
                         print('Bad selected page.')
                 else:
@@ -314,21 +189,7 @@ class AutoPy:
         ages = []
         sizes = []
 
-        if self.page == 'torrent_project':
-            titles = [list(span.find('a').stripped_strings)[0]
-                      for span in self.elements[0]]
-
-            seeders = [span.get_text() for span in self.elements[1]]
-            leechers = [span.get_text() for span in self.elements[2]]
-            ages = [span.get_text() for span in self.elements[3]]
-            sizes = [span.get_text() for span in self.elements[4]]
-
-            # Torrents
-            self.hrefs = [self.domain +
-                          span.find('a')['href']
-                          for span in self.elements[0]]
-
-        elif self.page == 'the_pirate_bay':
+        if self.page == 'the_pirate_bay':
             for elem in self.elements[0]:
                 title = elem.find('a', {'class': 'detLink'}).get_text()
                 titles.append(title)
@@ -347,52 +208,7 @@ class AutoPy:
             seeders = [elem.get_text() for elem in self.elements[1]]
             leechers = [elem.get_text() for elem in self.elements[2]]
 
-        elif self.page == '1337x':
-            titles = [elem.get_text() for elem in self.elements[0]]
-            seeders = [elem.get_text() for elem in self.elements[1]]
-            leechers = [elem.get_text() for elem in self.elements[2]]
-            ages = [elem.get_text() for elem in self.elements[3]]
-            sizes = [elem.get_text('|').split('|')[0]
-                     for elem in self.elements[4]]
-
-            # Torrent
-            self.hrefs = [self.domain +
-                          elem.find(href=re.compile('torrent'))['href']
-                          for elem in self.elements[0]]
-
-        elif self.page == 'eztv':
-            titles = [elem.get_text() for elem in self.elements[0]]
-            seeders = [elem.get_text() for elem in self.elements[4]]
-            leechers = ['-' for elem in self.elements[4]]
-            ages = [elem.get_text() for elem in self.elements[3]]
-            sizes = [elem.get_text() for elem in self.elements[2]]
-
-            # Magnets
-            self.hrefs = [elem.find(href=re.compile('magnet'))['href']
-                          for elem in self.elements[1]]
-
-        elif self.page == 'limetorrents':
-            titles = [elem.get_text() for elem in self.elements[0]]
-            seeders = [elem.get_text() for elem in self.elements[3]]
-            leechers = [elem.get_text() for elem in self.elements[4]]
-            ages = [elem.get_text() for elem in self.elements[1]]
-            sizes = [elem.get_text() for elem in self.elements[2]]
-
-            # Magnets
-            self.hrefs = [elem.find('a', href=re.compile('torrent'))['href']
-                          for elem in self.elements[0]]
-
-        elif self.page == 'isohunt':
-            titles = [elem.get_text() for elem in self.elements[0]]
-            seeders = [elem.get_text() for elem in self.elements[5]]
-            leechers = ['-' for elem in self.elements[5]]
-            ages = [elem.get_text() for elem in self.elements[3]]
-            sizes = [elem.get_text() for elem in self.elements[4]]
-
-            # Torrents
-            self.hrefs = [self.domain +
-                          elem.find(href=re.compile('torrent_details'))['href']
-                          for elem in self.elements[0]]
+        
         else:
             print('Error page')
 
@@ -416,12 +232,6 @@ class AutoPy:
                        else Colors.PURPLE + sizes[i].strip() + Colors.ENDC]
                       for i in range(len(self.hrefs))]
 
-        print(tabulate(self.table,
-                       headers=headers,
-                       tablefmt='psql',
-                       numalign='right',
-                       stralign='left',
-                       showindex=True))
 
     def soupify(self):
         """Get proper torrent/magnet information.
@@ -430,20 +240,8 @@ class AutoPy:
         If not, get all the elements to build the table.
         There are different ways for each page.
         """
-        soup = BeautifulSoup(self.content_page.content, 'lxml')
-        if self.page == 'torrent_project':
-            main = soup.find('div', {'id': 'similarfiles'})
-            if self.mode_search == 'best_rated':
-                rated_url = self.domain + \
-                    main.find(href=re.compile('torrent.html'))['href']
-                self.get_magnet(rated_url)
-            else:
-                divs = main.find_all('div', limit=30)[2:]
-                self.elements = list(
-                    zip(*[d.find_all('span', recursive=False)
-                          for d in divs]))  # Torrents
-
-        elif self.page == 'the_pirate_bay':
+        soup = BeautifulSoup(self.content_page.content, 'lxml')  
+        if self.page == 'the_pirate_bay':
             main = soup.find('table', {'id': 'searchResult'})
             if self.mode_search == 'best_rated':
                 rated_url = self.domain + \
@@ -453,53 +251,7 @@ class AutoPy:
                 trs = main.find_all('tr', limit=30)[1:]
                 self.elements = list(
                     zip(*[tr.find_all('td', recursive=False)[1:]
-                          for tr in trs]))  # Magnets
-
-        elif self.page == '1337x':
-            main = soup.find('table', {'class': 'table'})
-            if self.mode_search == 'best_rated':
-                rated_url = self.domain + \
-                    main.find('a', href=re.compile('torrent'))['href']
-                self.get_magnet(rated_url)
-            else:
-                trs = main.find_all('tr', limit=30)[1:]
-                self.elements = list(
-                    zip(*([tr.find_all('td', recursive=False)[:-1]
-                           for tr in trs])))  # Torrents
-
-        elif self.page == 'eztv':
-            main = soup.find_all('table', {'class': 'forum_header_border'})[2]
-            if self.mode_search == 'best_rated':
-                self.magnet = main.find('a', href=re.compile('magnet'))['href']
-            else:
-                trs = main.find_all('tr', limit=30)[2:]
-                self.elements = list(
-                    zip(*([tr.find_all('td', recursive=False)[1:-1]
-                           for tr in trs])))  # Magnets
-
-        elif self.page == 'limetorrents':
-            main = soup.find('table', {'class': 'table2'})
-            if self.mode_search == 'best_rated':
-                self.magnet = main.find(
-                    'a', href=re.compile('torrent'))['href']
-            else:
-                trs = main.find_all('tr', limit=30)[1:]
-                self.elements = list(
-                    zip(*([tr.find_all('td', recursive=False)[:-1]
-                           for tr in trs])))  # Magnets
-
-        elif self.page == 'isohunt':
-            main = soup.find('table', {'class': 'table'})
-            if self.mode_search == 'best_rated':
-                rated_url = self.domain + \
-                    main.find('a', href=re.compile(
-                        'torrent_details'))['href']
-                self.get_magnet(rated_url)
-            else:
-                trs = main.find_all('tr', limit=30)[1:-1]
-                self.elements = list(
-                    zip(*([tr.find_all('td', recursive=False)[1:-1]
-                           for tr in trs])))  # Torrent
+                          for tr in trs]))  # Magnets        
         else:
             print('Cannot soupify current page. Try again.')
 
@@ -607,7 +359,7 @@ def insert(args):
 
 def initialize():
     """Initialize script."""
-    print("Welcome to auto_py_torrent!\n")
+    #print("Welcome to auto_py_torrent!\n")
 
 
 def run_it():
@@ -622,19 +374,19 @@ def run_it():
             args = parser.parse_args()
             
         else:
-            print(textwrap.dedent(
-                '''\
-                Search again like in the beginning.
-                  -- You can either choose best rated or list mode.
-                  -- This time, you can insert the search string without double quotes.
-                  Remember the list mode options!
-                    0: torrent project.
-                    1: the pirate bay.
-                    2: 1337x.
-                    3: eztv.
-                    4: limetorrents.
-                    5: isohunt.
-                '''))
+            # print(textwrap.dedent(
+            #     '''\
+            #     Search again like in the beginning.
+            #       -- You can either choose best rated or list mode.
+            #       -- This time, you can insert the search string without double quotes.
+            #       Remember the list mode options!
+            #         0: torrent project.
+            #         1: the pirate bay.
+            #         2: 1337x.
+            #         3: eztv.
+            #         4: limetorrents.
+            #         5: isohunt.
+            #     '''))
             sys.exit(0)
             print('Or.. if you want to exit just write "' +
                   Colors.LRED + 'Q' + Colors.ENDC + '" or "' +

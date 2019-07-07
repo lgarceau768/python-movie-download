@@ -1,4 +1,4 @@
-import os, sys, configparser, urllib.request, sys, re, requests, time
+import os, sys, configparser, urllib.request, sys, re, requests, time, csv
 from bs4 import BeautifulSoup
 
 #### defined functions
@@ -17,11 +17,25 @@ def checkExists(filename):
 def readFile(file):
     fileList = []
     checkExists(file)
-    with open(file, 'r') as sourceFile:
-        read = sourceFile.readlines()
-        for line in read:
-            if len(line) > 2:
-                fileList.append(line.strip())
+    if file.endswith('.txt'):
+        with open(file, 'r') as sourceFile:
+            read = sourceFile.readlines()
+            for line in read:
+                if len(line) > 2:
+                    fileList.append(line.strip())
+    elif file.endswith('.csv'):
+        with open(file, 'r') as traktFile:
+            csvReader = csv.reader(traktFile, delimiter=',')
+            lineCount = 0
+            for row in csvReader:
+                if lineCount == 0:
+                    # column names
+                    lineCount += 1
+                else:
+                    movieName = row[3]
+                    if movieName is not None:
+                        if len(movieName) > 1:
+                            fileList.append(movieName)
     return fileList
             
 
@@ -56,6 +70,7 @@ if operation == 'bulk':
     movies = readFile(fileName)
     print(movies)
     for movie in movies:
+        #print('movie')
         os.system('python .\\auto-py-torrent.py 1 1 '+movie.replace(' ','_'))
 
 # now output the movies to a text file
