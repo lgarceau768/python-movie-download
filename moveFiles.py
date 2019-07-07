@@ -1,5 +1,4 @@
-import os, sys, configparser
-from pathlib import Path
+import os, sys, configparser, shutil
 
 # function to get movie extensions from file
 def getMovieExtensions():
@@ -43,26 +42,19 @@ dirNames = newList
 
 for dirName in dirNames:
     for file in os.listdir(outputDir+dirName+'\\'):
+        #print('dirName: '+dirName+' file '+file)
         for extension in movieFileExtensions:
+            #print('extension: '+extension)
             if file.endswith(extension):
-                path = os.path.join(outputDir+dirName+'\\', file)
-                if os.path.getsize(path) >= 1000000000: # only move files over 1gb                    
-                    #print(path)
-                    try:
-                        if not os.path.isfile('listOfMovies.txt'):
-                            with open('listOfMovies.txt', 'w') as file:
-                                file.close()
-                        with open('listOfMovies.txt', 'a') as movieList:
-                            movieList.write(path)
-                        try:
-                            os.system('move '+path+' D:\Movies\\')
-                        except Exception as e:
-                            print('Error moving path: '+str(path)+' must manually move')
-                        try:
-                            os.system('rmdir /Q /S D:\Movies\\'+dirName)
-                        except Exception as e:
-                            print('Error removing dir: '+dirName+ ' must manually remove')
-                    except Exception as e:
-                        print('Error file operations path: '+str(path)+' must manually move')
+                path = os.path.join(outputDir+'\\'+dirName+'\\'+file)
+                dirPath = os.path.join(outputDir+'\\'+dirName)
+                if not os.path.isfile('listOfMovies.txt'):
+                    with open('listOfMovies.txt', 'w') as file:
+                        file.close()
+                with open('listOfMovies.txt', 'a') as movieList:
+                    movieList.write(os.path.join(file)+'\n')
+                #os.system('move '+path+' \''+outputDir+'\'')           
+                shutil.move(path, outputDir)
+                shutil.rmtree(dirPath)
                    
     
