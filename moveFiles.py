@@ -53,8 +53,12 @@ for dirName in dirNames:
                         file.close()
                 with open('listOfMovies.txt', 'a') as movieList:
                     movieList.write(os.path.join(file)+'\n')
-                #os.system('move '+path+' \''+outputDir+'\'')           
-                shutil.move(path, outputDir)
-                shutil.rmtree(dirPath)
+                #os.system('move '+path+' \''+outputDir+'\'') 
+                try:
+               	    shutil.move(path, outputDir)
+                    shutil.rmtree(dirPath)
+		except Exception as e:
+		    print('Exception in moving / deleting files %s' % str(e))
+
                    
     
