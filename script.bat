@@ -1,6 +1,6 @@
 @echo off
-set /p operation=Enter Operation = 
-set /p name=Enter Name movieName or fileName = 
+set /p operation=%1
+set /p name=%2
 
 python .\downloadMovie.py %operation% %name%
 cd D:\Movies\
