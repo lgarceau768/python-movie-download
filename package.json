@@ -1,0 +1,21 @@
+{
+    "name": "python-movie-manager",
+    "description": "Batch / Python Project for downloading movies / tv shows as torrents and moving them to a file location",
+    "version" : "1.0",
+    "repository": "https://github.com/lgarceau768/python-movie-download",
+    "bugs" : "https://github.com/lgarceau768/python-movie-download/issues",
+    "dependencies": {
+        "pip" : "19.1.1",
+        "aria2c" : "1.34.0",
+        "beautifulsoup4" : "4.7.1",
+        "requests" : "2.22.0"
+    },
+    "scripts": {
+        "script.bat" : "actual program script",
+        "runProgram.bat" : "run program showing amount of time of completion"
+    },
+    "engines":{
+        "python" : ">3.7"
+    },
+    "license": "LTG"
+}
