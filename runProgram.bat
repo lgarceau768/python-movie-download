@@ -1,2 +1,2 @@
 @echo off
-ptime .\script.bat
+ptime .\script.bat %1 %2
