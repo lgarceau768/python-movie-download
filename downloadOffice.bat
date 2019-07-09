@@ -1,0 +1,2 @@
+@echo off
+aria2c.exe --seed-ratio=0 --file-allocation=none 'magnet:?xt=urn:btih:02576ba7cf2d093e3f0f463a595b316d83c8f00f&dn=The.Office+U.S.+Season+1-8+%5B720p%5D+%5BHD%5D&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.openbittorrent.com%3A80&tr=udp%3A%2F%2Fopen.demonii.com%3A1337&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Fexodus.desync.com%3A6969'

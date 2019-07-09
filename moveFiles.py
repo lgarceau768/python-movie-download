@@ -53,12 +53,13 @@ for dirName in dirNames:
                         file.close()
                 with open('listOfMovies.txt', 'a') as movieList:
                     movieList.write(os.path.join(file)+'\n')
-                #os.system('move '+path+' \''+outputDir+'\'') 
-                try:
-               	    shutil.move(path, outputDir)
+                #os.system('move '+path+' \''+outputDir+'\'')  
+                try:         
+                    shutil.move(path, outputDir)
                     shutil.rmtree(dirPath)
-		except Exception as e:
-		    print('Exception in moving / deleting files %s' % str(e))
-
+                except Exception as e:
+                    # probably already a file named %s
+                    print('Exception when moving file and deleting old dir: + %s' % str(e))
+                    print('Probably a duplicate movie file')
                    
     
