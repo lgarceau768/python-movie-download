@@ -261,6 +261,15 @@ class AutoPy:
                         time.sleep(5)
                         if self.retries < 5:
                             self.soupify()
+                        else:
+                            # failed to get the url for that movie
+                            # output to failed movies .txt
+                            if not os.path.isfile('failedMovies.txt'):
+                                with open('failedMovies.txt','w') as file:
+                                    file.close()
+                            with open('failedMovies.txt','a') as file:
+                                file.write(self.movieName+'\n')
+                                file.close()
 
         else:
             print('Cannot soupify current page. Try again.')
