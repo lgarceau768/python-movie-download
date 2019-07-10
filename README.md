@@ -34,13 +34,13 @@ __*movieExtensions.txt*__
    
    ` .avi` -- added extension
    
-2. Changing the output location. Currently in the *config.ini* the program is outputting to my network drive. Change this to your specified output
+~~2. Changing the output location. Currently in the *config.ini* the program is outputting to my network drive. Change this to your specified output
 example:
 __*config.ini*__
 
 	`[Output]`
 
-	`output location = C:\Movies\ `
+	`output location = C:\Movies\ `~~
 
 # Importing From Csv
 Currently I am reading from a csv with this format:
