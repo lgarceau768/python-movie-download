@@ -14,12 +14,15 @@ You can run the script to either download a single movie or download multiple fr
  1. Clone the repository `git clone https://github.com/lgarceau768/python-movie-download.git`
  2. Modify the `output location` in *config.ini* to output to your desired directory
  # Running the Program
- 1. Run the script *"in cmd or powershell"* `.\runProgram.bat` with the desired arguements
+ 1. Run the script *"in cmd or powershell"* `.\runProgram.bat` with the desired arguements:
  # Arguements
 1. Operation <single/bulk> depending on what you would like to do
 2. File/Movie Name
 	a. name of the movie if the operation is single
 	b. name of the file *".txt" or ".csv"* if the operation is bulk
+3. Output location path (full path)
+__*example*__
+`./runProgram.bat bulk newMovies.csv 'D:\Movies\'`
 # Modifying the Program
 1. My program uses a txt file for its video extensions, currently I have just been seeing mkv and mp4 files. Add any other extensions to this file with a new line
 example:
